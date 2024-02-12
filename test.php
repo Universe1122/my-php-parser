@@ -4,13 +4,19 @@ use PhpParser\{Error, NodeVisitorAbstract, NodeTraverser, Node};
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
 
-include __DIR__ . "/visitor/EchoVisitor.php";
+include __DIR__ . "/visitor/Visitor.php";
 
 $code = <<<'CODE'
 <?php
 
-$var = "test";
-echo "var: " . $var;
+function test() {};
+
+$data1 = $_POST["asdf"];
+$data2 = "asdf";
+$data3 = 1;
+$data4 = 2.1;
+$data5 = test();
+// echo "var: " . $var;
 CODE;
 
 $parser = (new ParserFactory())->createForNewestSupportedVersion();
@@ -22,7 +28,7 @@ try {
 }
 
 $traverser = new NodeTraverser();
-$traverser->addVisitor(new EchoVisitor());
+$traverser->addVisitor(new Visitor());
 
 
 
