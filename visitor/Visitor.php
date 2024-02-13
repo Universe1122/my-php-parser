@@ -18,7 +18,8 @@ class Visitor extends NodeVisitorAbstract {
         $variable_visitor = new VariableVisitor($nodes);
         $echo_visitor = new EchoVisitor($nodes);
         echo "\n\n";
-        var_dump($variable_visitor->variable);
+        print_r($variable_visitor->variable);
+        // print_r($variable_visitor->variable["data6"]["value"][0]);
         new EchoXss($variable_visitor, $echo_visitor); 
     }
 }

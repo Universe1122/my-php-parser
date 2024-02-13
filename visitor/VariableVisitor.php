@@ -30,11 +30,6 @@ class VariableVisitor {
             if($node instanceof PhpParser\Node\Stmt\Expression){
                 $this->parse($node->expr);
                 echo $this->dumper->dump($node->expr) . "\n";
-                // $variable_name = $node->expr->var->name;
-                // // $value = $node->expr->expr->value;
-                // $value = $this->valueParser($node->expr->expr);
-
-                // $this->variable[$variable_name] = $value;
             }
         }
     }
@@ -113,27 +108,8 @@ class VariableVisitor {
         if($expr instanceof PhpParser\Node\Expr\Array_) {
             // Example
             // $data6 = array(1,"test" => 1,3);
-
-            $result = array();
-            
-            foreach($expr->items as $item) {
-                // key가 있는 경우
-                // TODO
-                // 여기 에러나는거 해결하기
-                if($item->key !== null) {
-                    array_push($result, array(
-                        $item->key => $this->parseVariableType($item->value)
-                    ));
-                }
-
-                // key가 없는 경우
-                else{
-                    array_push($result, $this->parseVariableType($item->value));
-                }
-            }
-
             return array(
-                "value" => $result,
+                "value" => $this->parseArray($expr),
                 "type" => get_class($expr)
             );
         }
@@ -190,49 +166,25 @@ class VariableVisitor {
         // TODO 
         // 함수의 리턴 값을 변수에 넣고 있는데, 이건 어떻게 처리해야 할지,,
         return "TODO: functionCall";
-    }    
+    }
+    
+    public function parseArray($expr) {
+        $result = array();
+            
+        foreach($expr->items as $item) {
+            if($item->key !== null) {
+                array_push($result, array(
+                    $item->key->value => $this->parseVariableType($item->value)
+                ));
+            }
 
-    // public function valueParser($expr){
-    //     // TODO
-    //     // 리커시브하게 이 함수를 호출할건데, 리턴 형태를 재정의 해야 할듯
-    //     echo $this->dumper->dump($expr) . "\n";
-    //     // echo get_class($expr) . "\n";
+            // key가 없는 경우
+            else{
+                array_push($result, $this->parseVariableType($item->value));
+            }
+        }
 
-    //     if($expr instanceof PhpParser\Node\Scalar\String_ || 
-    //         $expr instanceof PhpParser\Node\Scalar\Int_ ||
-    //         $expr instanceof PhpParser\Node\Scalar\Float_) {
-    //         return array(
-    //             "value" => $expr->value,
-    //             "type" => get_class($expr)
-    //         );
-    //     }
-
-    //     if($expr instanceof PhpParser\Node\Expr\FuncCall){
-    //         // TODO
-    //         // 함수 리턴 값이 변수에 들어갈 때, 이를 처리하는 로직 추가하기
-    //         return array(
-    //             "value" => "TODO",
-    //             "type" => get_class($expr)
-    //         );
-    //     }
-
-    //     if($expr instanceof PhpParser\Node\Expr\Array_) {
-    //         // echo $this->dumper->dump($expr->items) . "\n";
-    //         // echo get_class($expr->items[0]) . "\n";
-    //         // var_dump($expr->items);
-    //         return array(
-    //             "value" => "TODO",
-    //             "type" => get_class($expr)
-    //         );  
-    //     }
-
-    //     if($expr instanceof PhpParser\Node\Expr\ArrayDimFetch) {
-
-    //     }
-
-
-    //     echo "[valueParser] Unexpected type: " . get_class($expr) . "\n";
-    //     return array();
-    // }
+        return $result;
+    }
 }
 ?>
