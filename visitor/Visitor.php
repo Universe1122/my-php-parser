@@ -17,8 +17,8 @@ class Visitor extends NodeVisitorAbstract {
     public function afterTraverse(array $nodes) {
         $variable_visitor = new VariableVisitor($nodes);
         $echo_visitor = new EchoVisitor($nodes);
-        echo "\n\n";
-        print_r($variable_visitor->variable);
+        // echo "\n\n";
+        // print_r($variable_visitor->variable);
         // print_r($variable_visitor->variable["data6"]["value"][0]);
         new EchoXss($variable_visitor, $echo_visitor); 
     }

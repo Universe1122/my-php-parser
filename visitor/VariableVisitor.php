@@ -15,21 +15,21 @@ class VariableVisitor {
         $this->nodes = $nodes;
         // https://www.php.net/manual/en/language.variables.superglobals.php
         $this->super_global = array(
-            "\$GLOBALS", // => TODO, 이거 어떻게 처리해야 할지
-            "\$_SERVER",
-            "\$_GET",
-            "\$_POST",
-            "\$_FILES",
-            "\$_COOKIE",
-            "\$_SESSION",
-            "\$_REQUEST",
-            "\$_ENV"
+            "GLOBALS", // => TODO, 이거 어떻게 처리해야 할지
+            "_SERVER",
+            "_GET",
+            "_POST",
+            "_FILES",
+            "_COOKIE",
+            "_SESSION",
+            "_REQUEST",
+            "_ENV"
         );
 
         foreach($nodes as $node) {
             if($node instanceof PhpParser\Node\Stmt\Expression){
                 $this->parse($node->expr);
-                echo $this->dumper->dump($node->expr) . "\n";
+                // echo $this->dumper->dump($node->expr) . "\n";
             }
         }
     }
@@ -55,7 +55,7 @@ class VariableVisitor {
                 type: String
         */
         // echo get_class($var) . "\n";
-        if($var instanceof PhpParser\Node\Expr\Variable){
+        if($var instanceof TYPE::$VAR){
             return $var->name;
         }
         
@@ -77,54 +77,54 @@ class VariableVisitor {
                 type: TODO
         */
 
-        if($expr instanceof PhpParser\Node\Scalar\String_) {
+        if($expr instanceof TYPE::$STRING) {
             return array(
                 "value" => $this->parseString($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$STRING
             );
         }
 
-        if($expr instanceof PhpParser\Node\Scalar\Int_) {
+        if($expr instanceof TYPE::$INT) {
             return array(
                 "value" => $this->parseInt($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$INT
             );
         }
 
-        if($expr instanceof PhpParser\Node\Scalar\Float_) {
+        if($expr instanceof TYPE::$FLOAT) {
             return array(
                 "value" => $this->parseFloat($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$FLOAT
             );
         }
 
-        if($expr instanceof PhpParser\Node\Expr\FuncCall){
+        if($expr instanceof TYPE::$FUNC){
             return array(
                 "value" => $this->parseFunctionCall($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$FUNC
             );
         }
 
-        if($expr instanceof PhpParser\Node\Expr\Array_) {
+        if($expr instanceof TYPE::$ARRAY) {
             // Example
             // $data6 = array(1,"test" => 1,3);
             return array(
                 "value" => $this->parseArray($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$ARRAY
             );
         }
 
-        if($expr instanceof PhpParser\Node\Expr\Variable) {
+        if($expr instanceof TYPE::$VAR) {
             // Example
             // $data3 = $data1
 
             return array(
                 "value" => $this->parseVariableName($expr),
-                "type" => get_class($expr)
+                "type" => TYPE::$VAR
             );
         }
 
-        if($expr instanceof PhpParser\Node\Expr\ArrayDimFetch) {
+        if($expr instanceof TYPE::$ARRAYDIMFETCH) {
             $result = array();
             $tmp_node = $expr;
             $tmp_dim = array();
@@ -132,7 +132,7 @@ class VariableVisitor {
             do {
                 array_unshift($tmp_dim, $this->parseVariableType($tmp_node->dim));
                 $tmp_node = $tmp_node->var;
-            } while($tmp_node instanceof PhpParser\Node\Expr\ArrayDimFetch);
+            } while($tmp_node instanceof TYPE::$ARRAYDIMFETCH);
 
             $var_name = $this->parseVariableName($tmp_node);
 
@@ -141,7 +141,7 @@ class VariableVisitor {
                     "key" => $var_name,
                     "dim" => $tmp_dim
                 ),
-                "type" => get_class($expr)
+                "type" => TYPE::$ARRAYDIMFETCH
             );
         }
 

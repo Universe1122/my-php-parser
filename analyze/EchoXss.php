@@ -1,21 +1,27 @@
 <?php
-    class EchoXss {
-        public $variable;
-        public $echo;
 
-        public function __construct($variable, $echo) {
-            $this->variable = $variable;
-            $this->echo = $echo;
+class EchoXss {
+    public $variable_parser;
+    public $echo_parser;
 
-            $this->analyze();
-        }
+    public function __construct($variable_parser, $echo_parser) {
+        $this->variable_parser = $variable_parser;
+        $this->echo_parser = $echo_parser;
 
-        public function analyze() {
-            foreach($this->echo->variable as $var) {
-                if($this->variable->variable[$var]["type"] == PhpParser\Node\Scalar\String_::class){
-                    echo "123";
+        $this->analyze();
+    }
+
+    public function analyze() {
+        foreach($this->echo_parser->variable as $var) {
+            $var = $this->variable_parser->variable[$var];
+            
+            if($var["type"] === TYPE::$ARRAYDIMFETCH){
+                // special variable 이면 일단 탐지
+                if (in_array($var["value"]["key"], $this->variable_parser->super_global)) {
+                    echo "XSS 가능\n"; 
                 }
             }
         }
     }
+}
 ?>

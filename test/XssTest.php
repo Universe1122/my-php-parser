@@ -1,12 +1,17 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 use PhpParser\{Error, NodeVisitorAbstract, NodeTraverser, Node};
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
 
-include __DIR__ . "/visitor/Visitor.php";
+include __DIR__ . "/../visitor/Visitor.php";
+include __DIR__ . "/../config.php";
 
 $code = <<<'CODE'
+<?php
+
+$data = $_GET["test"];
+echo $data;
 
 CODE;
 
