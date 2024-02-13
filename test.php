@@ -11,11 +11,15 @@ $code = <<<'CODE'
 
 function test() {};
 
-$data1 = $_POST["asdf"];
-$data2 = "asdf";
-$data3 = 1;
-$data4 = 2.1;
-$data5 = test();
+// $data0 = $_GET;
+// $data1 = $_POST["asdf"];
+// $data2 = $data[1][2];
+// $data3 = $data1;
+// $data2 = "asdf";
+// $data3 = 1;
+// $data4 = 2.1;
+// $data5 = test();
+$data6 = array(1,"test" => 1,3);
 // echo "var: " . $var;
 CODE;
 
