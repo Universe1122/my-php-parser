@@ -15,7 +15,7 @@ class EchoXss {
         foreach($this->echo_parser->variable as $var) {
             $var = $this->variable_parser->variable[$var];
             
-            if($var["type"] === TYPE::$ARRAYDIMFETCH){
+            if($var["type"] === TYPE::$ArrayDimFetch){
                 // special variable 이면 일단 탐지
                 if (in_array($var["value"]["key"], $this->variable_parser->super_global)) {
                     echo "XSS 가능\n"; 

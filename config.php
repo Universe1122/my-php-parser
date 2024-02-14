@@ -8,22 +8,22 @@ use PhpParser\Node\Expr\Variable as VariableExpr;
 use PhpParser\Node\Expr\ArrayDimFetch as ArrayDimFetchExpr;
 
 class TYPE {
-    public static $STRING;
-    public static $INT;
-    public static $FLOAT;
-    public static $FUNC;
-    public static $ARRAY;
-    public static $VAR;
-    public static $ARRAYDIMFETCH;
+    public static $String;
+    public static $Int;
+    public static $Float;
+    public static $Func;
+    public static $Array;
+    public static $Variable;
+    public static $ArrayDimFetch;
 
     public static function initialize() {
-        self::$STRING = StringScalar::class;
-        self::$INT = IntScalar::class;
-        self::$FLOAT = FloatScalar::class;
-        self::$FUNC = FuncCallExpr::class;
-        self::$ARRAY = ArrayExpr::class;
-        self::$VAR = VariableExpr::class;
-        self::$ARRAYDIMFETCH = ArrayDimFetchExpr::class;
+        self::$String = StringScalar::class;
+        self::$Int = IntScalar::class;
+        self::$Float = FloatScalar::class;
+        self::$Func = FuncCallExpr::class;
+        self::$Array = ArrayExpr::class;
+        self::$Variable = VariableExpr::class;
+        self::$ArrayDimFetch = ArrayDimFetchExpr::class;
     }
 }
 

@@ -55,7 +55,7 @@ class VariableVisitor {
                 type: String
         */
         // echo get_class($var) . "\n";
-        if($var instanceof TYPE::$VAR){
+        if($var instanceof TYPE::$Variable){
             return $var->name;
         }
         
@@ -77,54 +77,54 @@ class VariableVisitor {
                 type: TODO
         */
 
-        if($expr instanceof TYPE::$STRING) {
+        if($expr instanceof TYPE::$String) {
             return array(
                 "value" => $this->parseString($expr),
-                "type" => TYPE::$STRING
+                "type" => TYPE::$String
             );
         }
 
-        if($expr instanceof TYPE::$INT) {
+        if($expr instanceof TYPE::$Int) {
             return array(
                 "value" => $this->parseInt($expr),
-                "type" => TYPE::$INT
+                "type" => TYPE::$Int
             );
         }
 
-        if($expr instanceof TYPE::$FLOAT) {
+        if($expr instanceof TYPE::$Float) {
             return array(
                 "value" => $this->parseFloat($expr),
-                "type" => TYPE::$FLOAT
+                "type" => TYPE::$Float
             );
         }
 
-        if($expr instanceof TYPE::$FUNC){
+        if($expr instanceof TYPE::$Func){
             return array(
                 "value" => $this->parseFunctionCall($expr),
-                "type" => TYPE::$FUNC
+                "type" => TYPE::$Func
             );
         }
 
-        if($expr instanceof TYPE::$ARRAY) {
+        if($expr instanceof TYPE::$Array) {
             // Example
             // $data6 = array(1,"test" => 1,3);
             return array(
                 "value" => $this->parseArray($expr),
-                "type" => TYPE::$ARRAY
+                "type" => TYPE::$Array
             );
         }
 
-        if($expr instanceof TYPE::$VAR) {
+        if($expr instanceof TYPE::$Variable) {
             // Example
             // $data3 = $data1
 
             return array(
                 "value" => $this->parseVariableName($expr),
-                "type" => TYPE::$VAR
+                "type" => TYPE::$Variable
             );
         }
 
-        if($expr instanceof TYPE::$ARRAYDIMFETCH) {
+        if($expr instanceof TYPE::$ArrayDimFetch) {
             $result = array();
             $tmp_node = $expr;
             $tmp_dim = array();
@@ -132,7 +132,7 @@ class VariableVisitor {
             do {
                 array_unshift($tmp_dim, $this->parseVariableType($tmp_node->dim));
                 $tmp_node = $tmp_node->var;
-            } while($tmp_node instanceof TYPE::$ARRAYDIMFETCH);
+            } while($tmp_node instanceof TYPE::$ArrayDimFetch);
 
             $var_name = $this->parseVariableName($tmp_node);
 
@@ -141,7 +141,7 @@ class VariableVisitor {
                     "key" => $var_name,
                     "dim" => $tmp_dim
                 ),
-                "type" => TYPE::$ARRAYDIMFETCH
+                "type" => TYPE::$ArrayDimFetch
             );
         }
 
