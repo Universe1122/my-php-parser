@@ -7,9 +7,7 @@ use PhpParser\ParserFactory;
 include __DIR__ . "/visitor/Visitor.php";
 include __DIR__ . "/config.php";
 
-$code = <<<'CODE'
-
-CODE;
+$code = file_get_contents("./test/XssTest.php");
 
 $parser = (new ParserFactory())->createForNewestSupportedVersion();
 try {
