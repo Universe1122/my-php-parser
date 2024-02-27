@@ -48,12 +48,12 @@ HtmlText       : ~[<#]+;
 XmlStart       : '<?xml'              -> pushMode(XML);
 PHPStartEcho   : PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart       : PhpStartFragment     -> channel(SkipChannel), pushMode(PHP);
-HtmlScriptOpen : '<script'            { _scriptTag = true; } -> pushMode(INSIDE);
-HtmlStyleOpen  : '<style'             { _styleTag = true; } -> pushMode(INSIDE);
+HtmlScriptOpen : '<script'            { _scriptTag = True; } -> pushMode(INSIDE);
+HtmlStyleOpen  : '<style'             { _styleTag = True; } -> pushMode(INSIDE);
 HtmlComment    : '<!' '--' .*? '-->'  -> channel(HIDDEN);
 HtmlDtd        : '<!' .*? '>';
 HtmlOpen       : '<'       -> pushMode(INSIDE);
-Shebang        : '#'       { this.IsNewLineOrStart(-2) }? '!' ~[\r\n]*;
+Shebang        : '#'       { self.IsNewLineOrStart(-2) }? '!' ~[\r\n]*;
 NumberSign     : '#' ~'<'* -> more;
 Error          : .         -> channel(ErrorLexem);
 
@@ -68,7 +68,7 @@ mode INSIDE;
 
 PHPStartEchoInside : PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside     : PhpStartFragment     -> channel(SkipChannel), pushMode(PHP);
-HtmlClose          : '>'                  { this.PushModeOnHtmlClose(); };
+HtmlClose          : '>'                  { self.PushModeOnHtmlClose(); };
 HtmlSlashClose     : '/>'                 -> popMode;
 HtmlSlash          : '/';
 HtmlEquals         : '=';
@@ -116,7 +116,7 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd            : ('?' | '%'    {this.HasAspTags()}?) '>' | '</script>' {this.HasPhpScriptTag()}?;
+PHPEnd            : ('?' | '%'    {self.HasAspTags()}?) '>' | '</script>' {self.HasPhpScriptTag()}?;
 Whitespace        : [ \t\r\n]+    -> channel(SkipChannel);
 MultiLineComment  : '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment : '//'          -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -303,7 +303,7 @@ CloseRoundBracket  : ')';
 OpenSquareBracket  : '[';
 CloseSquareBracket : ']';
 OpenCurlyBracket   : '{';
-CloseCurlyBracket  : '}' { this.PopModeOnCurlyBracketClose(); };
+CloseCurlyBracket  : '}' { self.PopModeOnCurlyBracketClose(); };
 Comma              : ',';
 Colon              : ':';
 SemiColon          : ';';
@@ -324,9 +324,9 @@ SingleQuoteString : '\'' (~('\'' | '\\') | '\\' .)* '\'';
 DoubleQuote       : '"' -> pushMode(InterpolationString);
 
 StartNowDoc:
-    '<<<' [ \t]* '\'' NameString '\'' { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
+    '<<<' [ \t]* '\'' NameString '\'' { self.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
 ;
-StartHereDoc : '<<<' [ \t]* NameString { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc);
+StartHereDoc : '<<<' [ \t]* NameString { self.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc);
 ErrorPhp     : .                       -> channel(ErrorLexem);
 
 mode InterpolationString;
@@ -334,7 +334,7 @@ mode InterpolationString;
 VarNameInInterpolation : '$' NameString -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString           : '$'            -> type(StringPart);
 CurlyDollar:
-    '{' { this.IsCurlyDollar(1) }? { this.SetInsideString(); } -> channel(SkipChannel), pushMode(PHP)
+    '{' { self.IsCurlyDollar(1) }? { self.SetInsideString(); } -> channel(SkipChannel), pushMode(PHP)
 ;
 CurlyString                : '{'    -> type(StringPart);
 EscapedChar                : '\\' . -> type(StringPart);
@@ -357,26 +357,32 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // fragments.
 // '<?=' will be transformed to 'echo' token.
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment : '<' ('?' '=' |    { this.HasAspTags() }? '%' '=');
-fragment PhpStartFragment     : '<' ('?' 'php'? | { this.HasAspTags() }? '%');
-fragment NameString: [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe]*;
-fragment HtmlNameChar:
+fragment PhpStartEchoFragment : '<' ('?' '=' |    { self.HasAspTags() }? '%' '=');
+fragment PhpStartFragment     : '<' ('?' 'php'? | { self.HasAspTags() }? '%');
+fragment NameString options {
+    caseInsensitive = false;
+}: [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe]*;
+fragment HtmlNameChar options {
+    caseInsensitive = false;
+}:
     HtmlNameStartChar
     | '-'
     | '_'
     | '.'
     | Digit
     | '\u00B7'
-    | '\u0300' .. '\u036F'
-    | '\u203F' .. '\u2040'
+    | '\u0300' ..'\u036F'
+    | '\u203F' ..'\u2040'
 ;
-fragment HtmlNameStartChar:
-    [a-zA-Z]
-    | '\u2070' .. '\u218F'
-    | '\u2C00' .. '\u2FEF'
-    | '\u3001' .. '\uD7FF'
-    | '\uF900' .. '\uFDCF'
-    | '\uFDF0' .. '\uFFFD'
+fragment HtmlNameStartChar options {
+    caseInsensitive = false;
+}:
+    [:a-zA-Z]
+    | '\u2070' ..'\u218F'
+    | '\u2C00' ..'\u2FEF'
+    | '\u3001' ..'\uD7FF'
+    | '\uF900' ..'\uFDCF'
+    | '\uFDF0' ..'\uFFFD'
 ;
 fragment LNum         : Digit+ ('_' Digit+)*;
 fragment ExponentPart : 'e' [+-]? LNum;
