@@ -1,6 +1,13 @@
+from utils.PhpParser import PhpParser
 from utils.PhpParserListener import PhpParserListener
+from analyzer.structure.DataFlow import *
+from analyzer.structure.Type import *
+from analyzer.analyzer import *
 
 class Listener(PhpParserListener):
+    def __init__(self):
+        self.variables = DataFlow()
+
     def enterEveryRule(self, ctx):
         # print("Rule:", PhpParser.ruleNames[ctx.getRuleIndex()])
         pass
@@ -13,6 +20,7 @@ class Listener(PhpParserListener):
         pass
 
     def enterEchoStatement(self, node):
+        pass
         data = node.expressionList()
         # print(dir(data.expression()[0]))
         print("echo param: ", data.expression()[0].getText())
@@ -27,3 +35,18 @@ class Listener(PhpParserListener):
         # if node.arguments() is not None:
         #     arguments = [arg.getText() for arg in node.arguments().actualArgument()]
         #     print("Arguments:", arguments)
+
+    def enterAssignmentExpression(self, ctx: PhpParser.AssignmentExpressionContext):
+        if not ctx.assignable():
+            print("[!] Not found variable name")
+            pass
+        
+        var_name: str = ctx.assignable().getText()
+
+        expression = assignmentExpression(ctx.expression().getChildren())
+        self.variables.addNode(var_name = var_name, expression = expression)
+        # self.variables.show()
+        # print("===== expression ======")
+        # for exp in expression:
+        #     print(exp.get())
+        # print("=======================")

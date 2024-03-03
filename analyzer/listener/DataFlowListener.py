@@ -1,11 +1,11 @@
 from utils.PhpParserListener import PhpParserListener
 from utils.PhpParser import PhpParser
 
-from analyzer.DataFlow import *
+from analyzer.structure.DataFlow import *
 
 class DataFlowListener(PhpParserListener):
     def __init__(self):
-        self.data_flow = DataFlowTree()
+        self.variables = list()
 
     def enterAssignmentExpression(self, ctx:PhpParser.AssignmentExpressionContext):
         # print(type(ctx.assignmentOperator()))
@@ -15,13 +15,21 @@ class DataFlowListener(PhpParserListener):
         ## 예를 들어, $x = 1; 이면 = 이 operator 값임
         # print(ctx.assignmentOperator().PlusEqual())
 
-        expression = ctx.expression()
+        # expression = ctx.expression()
+        print(ctx.children[0].getText())
 
-        if type(expression) is PhpParser.ScalarExpressionContext:
+        for token in ctx.children:
+            ## 변수 이름
+            if type(token) is PhpParser.AssignableContext: 
+                self.variables.append(Node(token.getText()))
+            
+            # elif type(token) is Php
+
+        # if type(expression) is PhpParser.ScalarExpressionContext:
             
         
-        elif type(expression) is PhpParser.ArithmeticExpressionContext:
-            pass
+        # elif type(expression) is PhpParser.ArithmeticExpressionContext:
+        #     pass
 
     # def enterVariable(self, ctx: PHPParser.VariableContext):
     #     pass
