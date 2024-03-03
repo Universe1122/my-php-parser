@@ -16,9 +16,9 @@ def main(argv):
     tree = parser.htmlDocument()
 
     # print(tree.toStringTree())
-    # print_tree(tree)
+    print_tree(tree)
     # print(prettify_lisp_string(Trees.toStringTree(tree, None, parser)))
-    # exit()
+    exit()
 
     listener = Listener()
     data_flow_listenr = DataFlowListener()

@@ -69,9 +69,21 @@ def assignmentExpression(data: list):
                     expression.append(FunctionConstant(chain_child.getText()))
         
         elif isinstance(child, PhpParser.ChainContext):
-            print("ChainContext: pass")
-            pass
-            # print(child.getText())
+            superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
+
+            for var in child.chainOrigin().chainBase().keyedVariable():
+                for child in var.getChildren():
+                    if isinstance(child, TerminalNodeImpl):
+                        
+                        if child.getText() in superglobals:
+                            ## TODO
+                            ## $_GET[$test], int($_GET["test"]) 이런 경우 구현
+                            expression.append(Variable(var.getText()))
+                        else:
+                            expression.append(Variable(var.getText()))
+                    
+
+            # expression.append(Variable(child.getText()))
             # print(child.chainOrigin().chainBase().keyedVariable()[0].children[1].getText())
 
         elif isinstance(child, PhpParser.ScalarExpressionContext):
@@ -90,3 +102,11 @@ def assignmentExpression(data: list):
             print("[!] Unknown child Type: ", type(child))
     
     return expression
+
+def echoStatement(expression: list):
+    parsed_expression = list()
+    for exp in expression:
+
+        parsed_expression = assignmentExpression(exp.getChildren())
+    
+

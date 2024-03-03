@@ -19,11 +19,12 @@ class Listener(PhpParserListener):
         # print("Terminal:", node.symbol.text)
         pass
 
-    def enterEchoStatement(self, node):
-        pass
-        data = node.expressionList()
+    def enterEchoStatement(self, ctx:PhpParser.EchoStatementContext):
+        echoStatement(ctx.expressionList().expression())
+        # print(ctx.expressionList().expression()[0].children)
+        # data = node.expressionList()
         # print(dir(data.expression()[0]))
-        print("echo param: ", data.expression()[0].getText())
+        # print("echo param: ", data.expression()[0].getText())
         # print("enterEchoStatement: ", node.expressionList())
     
     def enterFunctionCall(self, node): 
