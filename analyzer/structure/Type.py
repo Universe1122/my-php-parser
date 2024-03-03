@@ -220,3 +220,18 @@ class Operator(Enum):
     BITWISE_NOT = "~"
     LEFT_SHIFT = "<<"
     RIGHT_SHIFT = ">>"
+
+class TypeDeclarations(Enum):
+    CLASS_NAME = "CLASS"
+    INTERFACE_NAME = "INTERFACE"
+    SELF = "SELF"
+    PARENT = "PARENT"
+    ARRAY = "ARRAY"
+    CALLABLE = "CALLABLE"
+    BOOL = "BOOL"
+    FLOAT = "FLOAT"
+    INT = "INT"
+    STRING = "STRING"
+    NULLABLE = "NULLABLE"
+    VOID = "VOID"
+    ITERABLE = "ITERABLE"

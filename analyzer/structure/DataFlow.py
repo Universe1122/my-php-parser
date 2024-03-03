@@ -5,6 +5,7 @@ class Node:
         self.name: str = name
         self.expression = expression
         self.next: Node = None
+        self.type = None
     
     def getName(self):
         return self.name
@@ -14,6 +15,9 @@ class Node:
     
     def getNext(self):
         return self.next
+    
+    def getType(self):
+        return self.type
 
 class DataFlow:
     def __init__(self):
@@ -29,13 +33,15 @@ class DataFlow:
 
         node = self.findVariable(var_name = var_name) 
         expression = self.expressionReference(expression = expression)
+        new_node = Node(name = var_name, expression = expression)
 
         if node == None:
-            new_node = Node(name = var_name, expression = expression)
+            new_node.type = self.__guessType(new_node)
             self.root.append(new_node)
         else:
             last_node = self.getLastNode(node)
-            last_node.next = Node(name = var_name, expression = expression)
+            new_node.type = self.__guessType(new_node)
+            last_node.next = new_node
     
     def findVariable(self, var_name: str) -> Node:
         """
@@ -96,6 +102,52 @@ class DataFlow:
             return [count, target_node]
         else:
             return [None, None]
+    
+    def __guessType(self, var: Variable):
+        _types = list()
+
+        for exp in var.getExpression():
+            if isinstance(exp, NumericNumberConstant):
+                _types.append(TypeDeclarations.INT)
+            elif isinstance(exp, RealNumberConstant):
+                _types.append(TypeDeclarations.FLOAT)
+            elif isinstance(exp, RealNumberConstant):
+                _types.append(TypeDeclarations.BOOL)
+            elif isinstance(exp, StringConstant):
+                _types.append(TypeDeclarations.STRING)
+            elif isinstance(exp, FunctionConstant):
+                _types.append(TypeDeclarations.CALLABLE)
+            elif isinstance(exp, OperatorConstant):
+                _types.append(exp.type)
+            elif isinstance(exp, UnknownVariable):
+                _types.append(None)
+        
+        if Operator.CONCATENATE in _types:
+            return TypeDeclarations.STRING
+        
+        elif Operator.PLUS in _types or \
+                Operator.MINUS in _types or \
+                Operator.MULTIPLY in _types or \
+                Operator.DIVIDE in _types or \
+                Operator.MODULO in _types:
+            return TypeDeclarations.INT
+
+
+        elif TypeDeclarations.INT in _types or TypeDeclarations.FLOAT in _types:
+            return TypeDeclarations.INT
+        
+        elif TypeDeclarations.BOOL in _types:
+            return TypeDeclarations.BOOL
+        
+        elif TypeDeclarations.CALLABLE in _types:
+            ## TODO
+            ## 함수 선언부에서 어떤 값을 리턴하는지 확인해야 함
+            print("[!] __guessType():CALLABLE -> return None")
+            return None
+        
+        else:
+            print("[!] __guessType():ELSE -> return None")
+            return None
 
     def show(self):
         import json
@@ -136,4 +188,5 @@ class DataFlow:
                 })
 
             print(f"next: ", json.dumps(next_node, indent=4))
+            print(f"type: {node.getType()}")
             print("\n")
