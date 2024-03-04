@@ -1,15 +1,25 @@
 from enum import Enum
+import json
 
 class Variable:
     def __init__(self, name: str):
         self.name = name
         self.type = None
+        self.link_node = None
     
-    def get(self):
+    def getName(self):
         return self.name
 
     def toString(self):
         return f"name={self.name}, type={self.type}"
+
+class Array:
+    def __init__(self, expression: list):
+        self.type = TypeDeclarations.ARRAY
+        self.expression: list = expression
+    
+    def getExpression(self) -> list:
+        return self.expression
 
 class UnknownVariable:
     def __init__(self, name: str):

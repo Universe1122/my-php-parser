@@ -6,7 +6,14 @@ def assignmentExpression(data: list):
     expression = []
     for child in data:
         if isinstance(child, PhpParser.ConstantContext):
+            
             if child.literalConstant() != None:
+                """
+                $data = 3.14;
+                $data = "test";
+                $data = true;
+                """
+
                 literal = child.literalConstant()
 
                 ## 실수 type
@@ -51,6 +58,10 @@ def assignmentExpression(data: list):
                 print("[!] Unknown Constant Type")
         
         elif isinstance(child, PhpParser.StringContext):
+            """
+            $data = "test";
+            """
+
             ## TODO
             ## 이렇게 getText() 함수만 처리해도 되나?
             data = child.getText()
@@ -58,6 +69,10 @@ def assignmentExpression(data: list):
             expression.append(StringConstant(data))
         
         elif isinstance(child, PhpParser.ChainExpressionContext):
+            """
+            $data = test() . "asdf";
+            """
+            
             for chain_child in child.chain().chainOrigin().getChildren():
                 
                 if isinstance(chain_child, PhpParser.ChainBaseContext):
@@ -69,6 +84,11 @@ def assignmentExpression(data: list):
                     expression.append(FunctionConstant(chain_child.getText()))
         
         elif isinstance(child, PhpParser.ChainContext):
+            """
+            $data = $x;
+            $data = $_GET["asdf"];
+            """
+
             superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
 
             for var in child.chainOrigin().chainBase().keyedVariable():
@@ -87,6 +107,10 @@ def assignmentExpression(data: list):
             # print(child.chainOrigin().chainBase().keyedVariable()[0].children[1].getText())
 
         elif isinstance(child, PhpParser.ScalarExpressionContext):
+            """
+            $data = "test" . "asdf";
+            """
+
             if child.string() != None:
                 data = child.getText()
                 data = data[1 : len(data) - 1]
@@ -96,7 +120,32 @@ def assignmentExpression(data: list):
                 expression.extend(assignmentExpression([child.constant()]))
         
         elif isinstance(child, TerminalNodeImpl):
+            """
+            +
+            -
+            /
+            """
+
             expression.append(OperatorConstant(child.getText()))
+        
+        elif isinstance(child, PhpParser.ArrayCreationContext):
+            """
+            $data = array(1,2);
+            """
+            
+            _expression = list()
+            for array_item in child.arrayItemList().arrayItem():
+                _expression.extend(assignmentExpression(array_item.expression()))
+            
+            new_array = Array(expression=_expression)
+            expression.append(new_array)
+
+        elif isinstance(child, PhpParser.ArrayCreationExpressionContext):
+            """
+            $data = array(1,array(1));
+            """
+            
+            expression.extend(assignmentExpression([child.arrayCreation()]))
 
         else:
             print("[!] Unknown child Type: ", type(child))

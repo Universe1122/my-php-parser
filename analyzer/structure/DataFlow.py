@@ -27,11 +27,11 @@ class DataFlow:
         """
         변수를 추적하기 위해, 변수 정보를 추가하는 함수
         - 새로운 변수인 경우, root 변수에 Node 객체를 생성하여 저장
-        - 기존에 존재하는 변수인 경우, findVariable() 함수로 해당 변수의 node를 찾고, 해당 node의 next 맴버 변수에 새로운 Node 객체를 저장
+        - 기존에 존재하는 변수인 경우, findNode() 함수로 해당 변수의 node를 찾고, 해당 node의 next 맴버 변수에 새로운 Node 객체를 저장
         - expression 안에 변수가 존재하는지 확인하기 위해 expressionReference() 함수로 확인
         """
 
-        node = self.findVariable(var_name = var_name) 
+        node = self.findNode(var_name = var_name) 
         expression = self.expressionReference(expression = expression)
         new_node = Node(name = var_name, expression = expression)
 
@@ -43,7 +43,7 @@ class DataFlow:
             new_node.type = self.__guessType(new_node)
             last_node.next = new_node
     
-    def findVariable(self, var_name: str) -> Node:
+    def findNode(self, var_name: str) -> Node:
         """
         변수 이름(var_name)을 가진 node를 찾는 함수
         """
@@ -62,9 +62,9 @@ class DataFlow:
 
         for exp in expression:
             if isinstance(exp, Variable):
-                var_name = exp.get()
+                var_name = exp.getName()
 
-                node = self.findVariable(var_name = var_name)
+                node = self.findNode(var_name = var_name)
 
                 if node == None:
                     ## TODO
@@ -74,8 +74,14 @@ class DataFlow:
                     continue
                 
                 last_node = self.getLastNode(node)
-                return_data.append(last_node)
+                exp.link_node = last_node
+                return_data.append(exp)
+
+            elif isinstance(exp, Array):
+                return_data.append(Array(expression=self.expressionReference(exp.getExpression())))
+
             else:
+                print(f"[!] expressionReference: else -> Unexpected Type: {type(exp)}")
                 return_data.append(exp)
         
         return return_data
@@ -119,11 +125,18 @@ class DataFlow:
                 _types.append(TypeDeclarations.CALLABLE)
             elif isinstance(exp, OperatorConstant):
                 _types.append(exp.type)
+            elif isinstance(exp, Array):
+                _types.append(exp.type)
+            elif isinstance(exp, Variable):
+                _types.append(exp.link_node.type)
             elif isinstance(exp, UnknownVariable):
                 _types.append(None)
         
-        if Operator.CONCATENATE in _types:
+        if Operator.CONCATENATE in _types or TypeDeclarations.STRING in _types:
             return TypeDeclarations.STRING
+    
+        elif TypeDeclarations.ARRAY in _types:
+            return TypeDeclarations.ARRAY
         
         elif Operator.PLUS in _types or \
                 Operator.MINUS in _types or \
@@ -156,9 +169,9 @@ class DataFlow:
             return_expression = list()
 
             for exp in expression:
-                if isinstance(exp, Node):
-                    target_node = self.findVariable(exp.getName())
-                    find_expression_ref_node = self.findExpressionReference(target_node=target_node, find_node=exp)
+                if isinstance(exp, Variable):
+                    target_node = self.findNode(exp.getName())
+                    find_expression_ref_node = self.findExpressionReference(target_node=target_node, find_node=exp.link_node)
                     
                     return_expression.append({
                         "index" : find_expression_ref_node[0],
@@ -166,6 +179,12 @@ class DataFlow:
                         "name" : exp.getName(),
                         "expression" : toStringExpression(find_expression_ref_node[1].getExpression())
                     })
+                elif isinstance(exp, Array):
+                    return_expression.append({
+                        "type" : str(exp.type),
+                        "expression" : toStringExpression(exp.getExpression())
+                    })
+
                 else:
                     return_expression.append({
                         "type" : str(type(exp)),

@@ -1,6 +1,12 @@
 <?php
-    // $x = 0o12;
-    $array = array(1, "2"); 
+    // $a = "a". "b";
+    // $a = "asdf";
+    // $a = test(). "b";
+    // $x = "a". "b";
+    // $x = "a". "b";
+    // $test2 = $x; 
+    $test = array(array(1));
+    // $test = array("1",$x); 
     // $x = $_GET["test"];
     // $z= "1";
     // $a = $z;
