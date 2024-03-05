@@ -79,6 +79,9 @@ class DataFlow:
 
             elif isinstance(exp, Array):
                 return_data.append(Array(expression=self.expressionReference(exp.getExpression())))
+            
+            elif isinstance(exp, Function):
+                return_data.append(Function(func_name=exp.getName(), expression=self.expressionReference(exp.getExpression())))
 
             else:
                 print(f"[!] expressionReference: else -> Unexpected Type: {type(exp)}")

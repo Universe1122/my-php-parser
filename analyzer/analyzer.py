@@ -68,33 +68,29 @@ def assignmentExpression(data: list):
             data = data[1 : len(data) - 1]
             expression.append(StringConstant(data))
         
-        elif isinstance(child, PhpParser.ChainExpressionContext):
+        elif isinstance(child, PhpParser.ChainExpressionContext) or \
+             isinstance(child, PhpParser.ChainContext):
             """
             $data = test() . "asdf";
-            """
-            
-            for chain_child in child.chain().chainOrigin().getChildren():
-                
-                if isinstance(chain_child, PhpParser.ChainBaseContext):
-                    for variable in chain_child.keyedVariable():
-                        expression.append(Variable(variable.getText()))
-                elif isinstance(chain_child, PhpParser.FunctionCallContext):
-                    expression.append(__functionParser(chain_child))
-        
-        elif isinstance(child, PhpParser.ChainContext):
-            """
+
             $data = $x;
             $data = $_GET["asdf"];
             $data = func();
-
-            뭔가 이렇게 문자열, 숫자가 아닌 이런 것들은 여기로 오는듯?
             """
+
+            if isinstance(child, PhpParser.ChainExpressionContext):
+                child = child.chain()
             
             for _child in child.chainOrigin().getChildren():
                 
                 if isinstance(_child, PhpParser.FunctionCallContext):
                     expression.append(__functionParser(_child))
-
+                
+                if isinstance(_child, PhpParser.ChainBaseContext):
+                    for __child in _child.keyedVariable():
+                        if __child.VarName():
+                            expression.append(__VariableParser(__child.VarName()))
+                            
             # superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
 
             # for var in child.chainOrigin().chainBase().keyedVariable():
@@ -187,3 +183,7 @@ def __functionParser(ctx: PhpParser.FunctionCallContext) -> Function:
             print("[!] Unknown Type in FunctionCallContext: ", type(child))
     
     return Function(func_name=func_name, expression=_expression)
+
+
+def __VariableParser(ctx):
+    return Variable(ctx.getText())
