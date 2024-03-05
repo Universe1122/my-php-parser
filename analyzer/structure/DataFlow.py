@@ -195,6 +195,7 @@ class DataFlow:
 
         for node in self.root:
             print(f"Variable Name: {node.getName()}")
+            print(f"type: {node.getType()}")
             print(f"expression: ", json.dumps(toStringExpression(node.getExpression()), indent=4))
 
             next_node = list()
@@ -203,9 +204,9 @@ class DataFlow:
                 tmp_node = tmp_node.getNext()
                 next_node.append({
                     "name" : tmp_node.getName(),
-                    "expression" : toStringExpression(tmp_node.getExpression())
+                    "expression" : toStringExpression(tmp_node.getExpression()),
+                    "type" : str(tmp_node.type)
                 })
 
             print(f"next: ", json.dumps(next_node, indent=4))
-            print(f"type: {node.getType()}")
             print("\n")
