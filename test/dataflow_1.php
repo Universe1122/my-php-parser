@@ -25,6 +25,7 @@
     $e_002 = test(1, test(1, "a"));
     $e_003 = test($a_000);
     $e_004 = test(1, test(1, $a_000));
+    $e_005 = test(array(1));
 
     // array 
     $f_000 = array(1);
