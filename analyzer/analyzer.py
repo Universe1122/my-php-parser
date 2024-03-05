@@ -79,28 +79,34 @@ def assignmentExpression(data: list):
                     for variable in chain_child.keyedVariable():
                         expression.append(Variable(variable.getText()))
                 elif isinstance(chain_child, PhpParser.FunctionCallContext):
-                    ## TODO
-                    ## 함수 호출일 때, getText() 로 함수 이름만 가져와도 되나?
-                    expression.append(FunctionConstant(chain_child.getText()))
+                    expression.append(__functionParser(chain_child))
         
         elif isinstance(child, PhpParser.ChainContext):
             """
             $data = $x;
             $data = $_GET["asdf"];
+            $data = func();
+
+            뭔가 이렇게 문자열, 숫자가 아닌 이런 것들은 여기로 오는듯?
             """
+            
+            for _child in child.chainOrigin().getChildren():
+                
+                if isinstance(_child, PhpParser.FunctionCallContext):
+                    expression.append(__functionParser(_child))
 
-            superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
+            # superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
 
-            for var in child.chainOrigin().chainBase().keyedVariable():
-                for child in var.getChildren():
-                    if isinstance(child, TerminalNodeImpl):
+            # for var in child.chainOrigin().chainBase().keyedVariable():
+            #     for child in var.getChildren():
+            #         if isinstance(child, TerminalNodeImpl):
                         
-                        if child.getText() in superglobals:
-                            ## TODO
-                            ## $_GET[$test], int($_GET["test"]) 이런 경우 구현
-                            expression.append(Variable(var.getText()))
-                        else:
-                            expression.append(Variable(var.getText()))
+            #             if child.getText() in superglobals:
+            #                 ## TODO
+            #                 ## $_GET[$test], int($_GET["test"]) 이런 경우 구현
+            #                 expression.append(Variable(var.getText()))
+            #             else:
+            #                 expression.append(Variable(var.getText()))
                     
 
             # expression.append(Variable(child.getText()))
@@ -159,3 +165,25 @@ def echoStatement(expression: list):
         parsed_expression = assignmentExpression(exp.getChildren())
     
 
+def __functionParser(ctx: PhpParser.FunctionCallContext) -> Function:
+    """
+    이 함수는 assignmentExpression() 함수에서 FunctionCallContext 타입일 때 호출된다.
+    외부에서 이 함수를 호출할 목적으로 만들어진 것이 아니다.
+    """
+
+    func_name = ""
+    _expression = list()
+
+    for child in ctx.getChildren():
+
+        if isinstance(child, PhpParser.FunctionCallNameContext):
+            func_name = child.getText()
+
+        elif isinstance(child, PhpParser.ActualArgumentsContext):
+            for arguments in child.arguments():
+                for argument in arguments.actualArgument():
+                    _expression.extend(assignmentExpression(argument.getChildren()))
+        else:
+            print("[!] Unknown Type in FunctionCallContext: ", type(child))
+    
+    return Function(func_name=func_name, expression=_expression)

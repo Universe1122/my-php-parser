@@ -1,11 +1,11 @@
 <?php
     // $a = "a". "b";
     // $a = "asdf";
-    // $a = test(). "b";
+    $a = test(1,test2(1));
     // $x = "a". "b";
     // $x = "a". "b";
     // $test2 = $x; 
-    $test = array(array(1));
+    // $test = array(array(1));
     // $test = array("1",$x); 
     // $x = $_GET["test"];
     // $z= "1";

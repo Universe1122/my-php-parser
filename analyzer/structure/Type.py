@@ -21,6 +21,18 @@ class Array:
     def getExpression(self) -> list:
         return self.expression
 
+class Function:
+    def __init__(self, func_name: str, expression: list):
+        self.name: str = func_name
+        self.type = TypeDeclarations.CALLABLE
+        self.expression: list = expression
+    
+    def getName(self):
+        return self.name
+    
+    def getExpression(self) -> list:
+        return self.expression
+
 class UnknownVariable:
     def __init__(self, name: str):
         self.name = name
@@ -75,17 +87,6 @@ class StringConstant:
     
     def toString(self):
         return f"value={self.value}, type={self.type}"
-
-class FunctionConstant:
-
-    def __init__(self, function_name: str):
-        self.name = function_name
-    
-    def get(self):
-        return self.name
-    
-    def toString(self):
-        return f"name={self.name}"
 
 class OperatorConstant:
     def __init__(self, operator: str):

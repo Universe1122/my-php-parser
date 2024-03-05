@@ -121,7 +121,7 @@ class DataFlow:
                 _types.append(TypeDeclarations.BOOL)
             elif isinstance(exp, StringConstant):
                 _types.append(TypeDeclarations.STRING)
-            elif isinstance(exp, FunctionConstant):
+            elif isinstance(exp, Function):
                 _types.append(TypeDeclarations.CALLABLE)
             elif isinstance(exp, OperatorConstant):
                 _types.append(exp.type)
@@ -156,7 +156,7 @@ class DataFlow:
             ## TODO
             ## 함수 선언부에서 어떤 값을 리턴하는지 확인해야 함
             print("[!] __guessType():CALLABLE -> return None")
-            return None
+            return TypeDeclarations.CALLABLE
         
         else:
             print("[!] __guessType():ELSE -> return None")
@@ -179,8 +179,16 @@ class DataFlow:
                         "name" : exp.getName(),
                         "expression" : toStringExpression(find_expression_ref_node[1].getExpression())
                     })
+
                 elif isinstance(exp, Array):
                     return_expression.append({
+                        "type" : str(exp.type),
+                        "expression" : toStringExpression(exp.getExpression())
+                    })
+                
+                elif isinstance(exp, Function):
+                    return_expression.append({
+                        "name" : exp.getName(),
                         "type" : str(exp.type),
                         "expression" : toStringExpression(exp.getExpression())
                     })
