@@ -9,7 +9,7 @@ import sys
 
 def main(argv):
     # input_stream = FileStream(argv[1])
-    input_stream = FileStream("test/dataflow_1.php")
+    input_stream = FileStream("test/dataflow_1.php", encoding='utf-8')
     lexer = PhpLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = PhpParser(stream)
