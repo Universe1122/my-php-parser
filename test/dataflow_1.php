@@ -27,11 +27,16 @@
     $e_004 = test(1, test(1, $a_000));
     $e_005 = test(array(1));
 
-    // array 
+    // array and Associative Array
     $f_000 = array(1);
     $f_001 = array("a");
     $f_002 = array(1, "a");
     $f_003 = array(1, array(1, "a"));
     $f_004 = array($a_000);
+    $f_005 = array("a" => 123);
+    $f_006 = array("a" => array(1));
+
+    // superglobal
+    // $g_000 = $_GET["test"];
 
 ?>

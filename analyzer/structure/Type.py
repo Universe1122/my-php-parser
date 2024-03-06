@@ -21,6 +21,18 @@ class Array:
     def getExpression(self) -> list:
         return self.expression
 
+class AssociativeArray:
+    def __init__(self, expression: dict):
+        self.type = TypeDeclarations.AssociativeArray
+        self.expression = expression
+    
+    def getExpression(self) -> dict:
+        return self.expression
+
+    def toString(self):
+        ## TODO
+        return f"key: {self.expression}"
+
 class Function:
     def __init__(self, func_name: str, expression: list):
         self.name: str = func_name
@@ -246,3 +258,4 @@ class TypeDeclarations(Enum):
     NULLABLE = "NULLABLE"
     VOID = "VOID"
     ITERABLE = "ITERABLE"
+    AssociativeArray = "AssociativeArray"

@@ -134,10 +134,34 @@ def assignmentExpression(data: list):
             """
             $data = array(1,2);
             """
-            
+
             _expression = list()
-            for array_item in child.arrayItemList().arrayItem():
-                _expression.extend(assignmentExpression(array_item.expression()))
+
+            for _child in child.arrayItemList().getChildren():
+                if isinstance(_child, PhpParser.ArrayItemContext):
+
+                    if _child.getChildCount() == 3:
+                        """
+                        dict 형태인 경우
+                        array("a" => 1)
+                        """
+                        tmp = list()
+                        tmp.extend(assignmentExpression(_child.expression()))
+
+                        _expression.append(AssociativeArray({tmp[0] : tmp[1]}))
+
+                    elif _child.getChildCount() == 1:
+                        """
+                        list 형태인 경우
+                        array(1, 2)
+                        """
+                        _expression.extend(assignmentExpression(_child.expression()))
+
+                    else:
+                        print("[!] Array 파싱 시, child 길이 예외 발생: ", _child.getChildCount())
+
+                else:
+                    print("[!] Array 파싱 시, 타입 예외 발생: ", type(_child))
             
             new_array = Array(expression=_expression)
             expression.append(new_array)
