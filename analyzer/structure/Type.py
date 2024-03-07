@@ -13,6 +13,22 @@ class Variable:
     def toString(self):
         return f"name={self.name}, type={self.type}"
 
+class SuperGlobals:
+    def __init__(self, name: str, expression: list):
+        self.name = name
+        self.expression = expression
+        self.type = SuperGlobals
+
+    def getName(self):
+        return self.name
+
+    def getExpression(self):
+        return self.expression  
+
+    def toString(self):
+         ## TODO
+        return f"name: {self.name}, expression: {self.expression}"
+
 class Array:
     def __init__(self, expression: list):
         self.type = TypeDeclarations.ARRAY
@@ -259,3 +275,4 @@ class TypeDeclarations(Enum):
     VOID = "VOID"
     ITERABLE = "ITERABLE"
     AssociativeArray = "AssociativeArray"
+    SuperGlobals = "SuperGlobals"

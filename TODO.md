@@ -13,7 +13,7 @@ TODO
 ```
 
 - ✅ show() 함수에서 next node 출력 시, 타입도 출력하기
-- 🚧 superglobal 변수 처리하기
+- ✅ superglobal 변수 처리하기
 
 ```php
 <?php

@@ -37,6 +37,6 @@
     $f_006 = array("a" => array(1));
 
     // superglobal
-    // $g_000 = $_GET["test"];
+    $g_000 = $_GET["test"]["a"];
 
 ?>

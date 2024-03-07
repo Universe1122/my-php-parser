@@ -78,6 +78,8 @@ def assignmentExpression(data: list):
             $data = func();
             """
 
+            superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
+
             if isinstance(child, PhpParser.ChainExpressionContext):
                 child = child.chain()
             
@@ -89,7 +91,21 @@ def assignmentExpression(data: list):
                 if isinstance(_child, PhpParser.ChainBaseContext):
                     for __child in _child.keyedVariable():
                         if __child.VarName():
-                            expression.append(__VariableParser(__child.VarName()))
+                            var_name = __child.VarName().getText()
+
+                            if var_name in superglobals:
+                                """
+                                $test = $_GET["test1"]["test2"];
+                                """
+                                _expression = list()
+                                for data in __child.squareCurlyExpression():
+                                    _expression.extend(assignmentExpression([data.expression()]))
+                                
+                                expression.append(SuperGlobals(name=var_name, expression=_expression))
+                            else:
+                                expression.append(__VariableParser(__child.VarName()))
+                        else:
+                            print("[!] VarName이 없는 상황 발생: ")
                             
             # superglobals = ['$GLOBALS', '$_SERVER', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV']
 

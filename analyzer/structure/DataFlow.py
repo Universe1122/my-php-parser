@@ -83,6 +83,14 @@ class DataFlow:
             elif isinstance(exp, Function):
                 return_data.append(Function(func_name=exp.getName(), expression=self.expressionReference(exp.getExpression())))
 
+            elif isinstance(exp, SuperGlobals):
+                return_data.append(SuperGlobals(name=exp.getName(), expression=self.expressionReference(exp.getExpression())))
+            
+            ## TODO
+            ## key랑 value가 변수인 경우, 추적은 어떻게?
+            # elif isinstance(exp, AssociativeArray):
+            #     return_data.append(AssociativeArray(expression=self.expressionReference(exp.getExpression())))
+
             else:
                 print(f"[!] expressionReference: else -> Unexpected Type: {type(exp)}")
                 return_data.append(exp)
@@ -130,6 +138,10 @@ class DataFlow:
                 _types.append(exp.type)
             elif isinstance(exp, Array):
                 _types.append(exp.type)
+            elif isinstance(exp, AssociativeArray):
+                _types.append(exp.type)
+            elif isinstance(exp, SuperGlobals):
+                _types.append(exp.type)
             elif isinstance(exp, Variable):
                 _types.append(exp.link_node.type)
             elif isinstance(exp, UnknownVariable):
@@ -140,6 +152,10 @@ class DataFlow:
     
         elif TypeDeclarations.ARRAY in _types:
             return TypeDeclarations.ARRAY
+        elif TypeDeclarations.AssociativeArray in _types:
+            return TypeDeclarations.AssociativeArray
+        elif TypeDeclarations.SuperGlobals in _types:
+            return TypeDeclarations.SuperGlobals
         
         elif Operator.PLUS in _types or \
                 Operator.MINUS in _types or \
