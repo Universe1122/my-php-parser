@@ -3,30 +3,35 @@ from antlr4.tree.Trees import Trees
 from utils.PhpLexer import PhpLexer
 from utils.PhpParser import PhpParser
 
+from analyzer.analyzer import Analyzer
 from analyzer.listener.Listener import Listener
 from analyzer.listener.DataFlowListener import DataFlowListener
+from config import log
 import sys
 
 def main(argv):
-    # input_stream = FileStream(argv[1])
-    input_stream = FileStream("test/dataflow_1.php", encoding='utf-8')
-    lexer = PhpLexer(input_stream)
-    stream = CommonTokenStream(lexer)
-    parser = PhpParser(stream)
-    tree = parser.htmlDocument()
+    analyzer = Analyzer(argv[1])
+    analyzer.start()
+    print(analyzer.models)
+    # input_stream = FileStream(argv[1], encoding='utf-8')
+    # # input_stream = FileStream("test/dataflow_1.php", encoding='utf-8')
+    # lexer = PhpLexer(input_stream)
+    # stream = CommonTokenStream(lexer)
+    # parser = PhpParser(stream)
+    # tree = parser.htmlDocument()
 
-    # print(tree.toStringTree())
-    # print_tree(tree)
-    # print(prettify_lisp_string(Trees.toStringTree(tree, None, parser)))
-    # exit()
+    # # print(tree.toStringTree())
+    # # print_tree(tree)
+    # # print(prettify_lisp_string(Trees.toStringTree(tree, None, parser)))
+    # # exit()
 
-    listener = Listener()
-    data_flow_listenr = DataFlowListener()
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
+    # listener = Listener(argv[1])
+    # data_flow_listenr = DataFlowListener()
+    # walker = ParseTreeWalker()
+    # walker.walk(listener, tree)
 
-    listener.variables.show()
-    # walker.walk(data_flow_listenr, tree)
+    # # listener.variables.show()
+    # # walker.walk(data_flow_listenr, tree)
 
 def print_tree(node, indent=0):
     if node is None:

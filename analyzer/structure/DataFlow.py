@@ -6,6 +6,7 @@ class Node:
         self.expression = expression
         self.next: Node = None
         self.type = None
+        self.taint = False
     
     def getName(self):
         return self.name
@@ -37,10 +38,12 @@ class DataFlow:
 
         if node == None:
             new_node.type = self.__guessType(new_node)
+            new_node.taint = self.__isTaint(new_node)
             self.root.append(new_node)
         else:
             last_node = self.getLastNode(node)
             new_node.type = self.__guessType(new_node)
+            new_node.taint = self.__isTaint(new_node)
             last_node.next = new_node
     
     def findNode(self, var_name: str) -> Node:
@@ -180,6 +183,13 @@ class DataFlow:
         else:
             print("[!] __guessType():ELSE -> return None")
             return None
+    
+    def __isTaint(self, node: Node):
+        ## TODO
+        ## 이래도 되나?? ㅋㅋ
+        if node.type == TypeDeclarations.SuperGlobals:
+            return True
+        return False
 
     def show(self):
         import json
@@ -223,6 +233,7 @@ class DataFlow:
         for node in self.root:
             print(f"Variable Name: {node.getName()}")
             print(f"type: {node.getType()}")
+            print(f"taint: {node.taint}")
             print(f"expression: ", json.dumps(toStringExpression(node.getExpression()), indent=4))
 
             next_node = list()

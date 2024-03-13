@@ -17,7 +17,7 @@ class SuperGlobals:
     def __init__(self, name: str, expression: list):
         self.name = name
         self.expression = expression
-        self.type = SuperGlobals
+        self.type = TypeDeclarations.SuperGlobals
 
     def getName(self):
         return self.name

@@ -1,6 +1,31 @@
+from antlr4 import *
+
+from utils.PhpLexer import PhpLexer
 from utils.PhpParser import PhpParser
 from analyzer.structure.Type import *
-from antlr4.tree.Tree import *
+from analyzer.listener.Listener import Listener
+from analyzer.listener.DataFlowListener import DataFlowListener
+from config import log
+
+class Analyzer:
+    
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.models = list()
+    
+    def start(self):
+        input_stream = FileStream(self.filename, encoding='utf-8')
+        lexer = PhpLexer(input_stream)
+        stream = CommonTokenStream(lexer)
+        parser = PhpParser(stream)
+        tree = parser.htmlDocument()
+
+        listener = Listener()
+        walker = ParseTreeWalker()
+        walker.walk(listener, tree)
+
+        listener.result["file"] = self.filename
+        self.models.append(listener.result)
 
 def assignmentExpression(data: list):
     expression = []
@@ -194,11 +219,22 @@ def assignmentExpression(data: list):
     
     return expression
 
-def echoStatement(expression: list):
-    parsed_expression = list()
-    for exp in expression:
+def echoStatement(ctx):
+    tmp_exp = list()
 
-        parsed_expression = assignmentExpression(exp.getChildren())
+    if isinstance(ctx, PhpParser.ParenthesisExpressionContext):
+        tmp_exp.extend(echoStatement(ctx.parentheses()))
+    elif isinstance(ctx, PhpParser.ArithmeticExpressionContext):
+        """
+        echo "123" . "123";
+        """
+        tmp_exp.extend(assignmentExpression(ctx.getChildren()))
+    elif isinstance(ctx, PhpParser.ParenthesesContext):
+        tmp_exp.extend(echoStatement(ctx.expression()))
+    else:
+        tmp_exp.extend(assignmentExpression([ctx]))
+        
+    return tmp_exp
     
 
 def __functionParser(ctx: PhpParser.FunctionCallContext) -> Function:
